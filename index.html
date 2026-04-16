@@ -31,15 +31,6 @@
   .body{position:relative;z-index:3;padding:80px;display:flex;flex-direction:column}
   @media(max-width:600px){.body{padding:40px 30px 40px}}
 
-  /* corner brackets */
-  .body::before,.body::after{
-    content:"";position:fixed;width:22px;height:22px;
-    border:0 solid #C8FF00;pointer-events:none;z-index:5;
-  }
-  .body::before{top:20px;left:20px;border-top-width:2px;border-left-width:2px}
-  .body::after{bottom:20px;right:20px;border-bottom-width:2px;border-right-width:2px}
-  .br-tr{position:fixed;top:20px;right:20px;width:22px;height:22px;border-top:2px solid #C8FF00;border-right:2px solid #C8FF00;pointer-events:none;z-index:5}
-  .br-bl{position:fixed;bottom:20px;left:20px;width:22px;height:22px;border-bottom:2px solid #C8FF00;border-left:2px solid #C8FF00;pointer-events:none;z-index:5}
 
   /* flex ordering */
   .section-top{order:1}
@@ -83,9 +74,10 @@
 
   .v2__bio-block{padding-top:8px}
   .v2__label{
-    font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:12px;
-    letter-spacing:.22em;text-transform:uppercase;color:#C8FF00;opacity:.6;
+    font-family:'Space Grotesk',sans-serif;font-weight:600;
+    letter-spacing:.15em;text-transform:uppercase;color:#C8FF00;opacity:.6;
     padding-bottom:14px;border-bottom:1px solid rgba(200,255,0,.25);margin-bottom:24px;
+    font-size:18px;
   }
   .v2__bio{
     font-size:20px;line-height:1.5;font-weight:400;color:#F0F0E8;
@@ -158,8 +150,6 @@
   <div class="overlay"></div>
 
   <div class="body">
-    <span class="br-tr"></span><span class="br-bl"></span>
-
     <div class="section-top">
       <header class="v2__hero">
         <h1 class="v2__title">Alexey<br>Strygin</h1>
@@ -178,12 +168,12 @@
           <ul class="v2__bio v2__list">
             <li>Conducted <a href="https://x.com/strygah/status/2018368734943916100" target="_blank">"How Billionaires Die"</a> research (500K+ views across platforms)</li>
             <li>Led a GLP-1 biotech as CEO starting in 2017, years before the GLP-1 wave</li>
-            <li>Co-organized <a href="https://hackaging.ai" target="_blank">Agentic AI Against Aging</a> hackathon (~1,000 registered)</li>
             <li>Secured critical funding for <a href="https://insilico.com/" target="_blank">Insilico Medicine</a> and <a href="http://gero.ai/" target="_blank">Gero</a> at pivotal moments</li>
             <li>Connected founders with capital and LPs with funds, including a $5M deal</li>
+            <li>Co-organized <a href="https://hackaging.ai" target="_blank">Agentic AI Against Aging</a> hackathon (~1,000 participants)</li>
             <li>Co-organized longevity-focused popup cities (<a href="https://www.zelar.city/" target="_blank">Zelar City</a> in Berlin, <a href="https://viva.city/frontier-tower" target="_blank">Viva Frontier Tower</a> in San Francisco)</li>
-            <li>Co-built a biomedical cluster in a special economic zone</li>
             <li>Created an Entrepreneurship in Biotech MSc course, taught 10+ generations of students</li>
+            <li>Co-built a biomedical cluster in a special economic zone</li>
             <li>Spoke at CogX (London), Longevity Summit Dublin, Longevity Nation (Tel Aviv), Insurtech Insights (Hong Kong), Interventions in Aging and multiple other conferences and podcasts</li>
           </ul>
         </div>
@@ -257,4 +247,3 @@
 </script>
 </body>
 </html>
-
