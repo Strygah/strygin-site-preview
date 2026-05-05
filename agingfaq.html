@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Aging.fyi &mdash; Quick start guide for longevity &mdash; Alexey Strygin</title>
+<meta name="description" content="A quick start guide for the longevity industry and your place in it.">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@500;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;background:#000;color:#fff;-webkit-font-smoothing:antialiased}
+  a{color:inherit}
+  img{display:block;max-width:100%}
+
+  .page{
+    background:#000;color:#F0F0E8;
+    font-family:'Space Grotesk',sans-serif;
+    min-height:100vh;position:relative;overflow:hidden;
+  }
+
+  #matrix-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0}
+  .overlay{
+    position:fixed;inset:0;z-index:1;pointer-events:none;
+    background:radial-gradient(ellipse at center,rgba(0,0,0,.7) 0%,rgba(0,0,0,.88) 60%,rgba(0,0,0,.95) 100%);
+  }
+
+  .inner{
+    position:relative;z-index:3;padding:100px 80px 80px;
+  }
+  @media(max-width:768px){.inner{padding:80px 24px 40px}}
+
+  /* corner brackets */
+  .inner::before,.inner::after{
+    content:"";position:fixed;width:22px;height:22px;
+    border:0 solid #C8FF00;pointer-events:none;z-index:5;
+  }
+  .inner::before{top:20px;left:20px;border-top-width:2px;border-left-width:2px}
+  .inner::after{bottom:20px;right:20px;border-bottom-width:2px;border-right-width:2px}
+  .br-tr{position:fixed;top:20px;right:20px;width:22px;height:22px;border-top:2px solid #C8FF00;border-right:2px solid #C8FF00;pointer-events:none;z-index:5}
+  .br-bl{position:fixed;bottom:20px;left:20px;width:22px;height:22px;border-bottom:2px solid #C8FF00;border-left:2px solid #C8FF00;pointer-events:none;z-index:5}
+
+  .back{
+    font-family:'Space Mono',monospace;font-size:13px;
+    color:#C8FF00;opacity:.7;letter-spacing:.1em;text-transform:uppercase;
+    text-decoration:none;display:inline-flex;align-items:center;gap:8px;
+    margin-bottom:40px;transition:opacity .2s;
+  }
+  .back:hover{opacity:1}
+
+  .uptitle{
+    font-family:'Space Mono',monospace;font-size:13px;
+    color:#C8FF00;opacity:.6;letter-spacing:.2em;text-transform:uppercase;
+    margin-bottom:14px;
+  }
+
+  .title{
+    font-family:'Onest',sans-serif;font-weight:800;
+    font-size:clamp(36px,6vw,80px);line-height:.95;
+    letter-spacing:-.02em;text-transform:uppercase;color:#C8FF00;
+    text-shadow:0 0 40px rgba(200,255,0,.25),0 0 80px rgba(200,255,0,.1);
+    margin-bottom:24px;
+  }
+  .lede{
+    font-size:18px;line-height:1.6;color:#F0F0E8;opacity:.9;
+    max-width:760px;margin-bottom:60px;
+  }
+
+  .content{max-width:820px}
+
+  .content h2{
+    font-family:'Onest',sans-serif;font-weight:800;
+    font-size:24px;text-transform:uppercase;color:#C8FF00;
+    letter-spacing:-.01em;margin:50px 0 6px;line-height:1.1;
+  }
+  .content h2:first-child{margin-top:0}
+  .content .sub{
+    font-family:'Space Mono',monospace;font-size:12px;
+    letter-spacing:.2em;text-transform:uppercase;
+    color:#C8FF00;opacity:.5;margin-bottom:22px;
+  }
+
+  .content p{font-size:17px;line-height:1.65;color:#F0F0E8;margin-bottom:16px}
+  .content strong{color:#C8FF00;font-weight:600}
+  .content sup a{
+    color:#C8FF00;text-decoration:none;font-weight:700;padding:0 2px;
+  }
+  .content sup a:hover{text-decoration:underline}
+
+  .content ul,.content ol{
+    margin:12px 0 16px 0;padding-left:24px;
+    font-size:17px;line-height:1.65;color:#F0F0E8;
+  }
+  .content li{margin-bottom:8px}
+  .content li::marker{color:#C8FF00}
+
+  .content em{font-style:italic;opacity:.85}
+
+  /* accordions */
+  .acc{border-top:1px solid rgba(200,255,0,.2);margin-top:8px}
+  .acc details{border-bottom:1px solid rgba(200,255,0,.2)}
+  .acc summary{
+    list-style:none;cursor:pointer;
+    padding:18px 0;
+    font-family:'Space Grotesk',sans-serif;font-weight:600;
+    font-size:18px;color:#F0F0E8;
+    display:flex;justify-content:space-between;align-items:center;gap:16px;
+    transition:color .2s;
+  }
+  .acc summary::-webkit-details-marker{display:none}
+  .acc summary:hover{color:#C8FF00}
+  .acc summary::after{
+    content:"+";color:#C8FF00;font-size:24px;font-weight:400;
+    flex-shrink:0;line-height:1;
+  }
+  .acc details[open] summary::after{content:"\2212"}
+  .acc-body{padding:0 0 22px 0;font-size:16px;line-height:1.65;color:#F0F0E8;opacity:.9}
+  .acc-body p{margin-bottom:10px;font-size:16px}
+  .acc-body h4{
+    font-family:'Space Mono',monospace;font-size:12px;font-weight:700;
+    letter-spacing:.2em;text-transform:uppercase;
+    color:#C8FF00;opacity:.7;margin:14px 0 6px;
+  }
+  .acc-body ul{padding-left:20px;margin:6px 0 12px;font-size:15px}
+  .acc-body li{margin-bottom:4px}
+  .acc-body a{color:#C8FF00;text-decoration:none;border-bottom:1px solid rgba(200,255,0,.3);transition:border-color .2s}
+  .acc-body a:hover{border-bottom-color:#C8FF00}
+
+  .refs{
+    margin-top:60px;padding-top:30px;border-top:1px solid rgba(200,255,0,.2);
+  }
+  .refs h2{margin-top:0!important;margin-bottom:20px!important}
+  .refs ol{font-size:14px;line-height:1.6;opacity:.78}
+  .refs li{margin-bottom:6px;word-break:break-word}
+  .refs a{color:#C8FF00;opacity:.85;text-decoration:none}
+  .refs a:hover{text-decoration:underline;opacity:1}
+
+  .credits{
+    margin-top:50px;padding:24px;
+    border:1px solid rgba(200,255,0,.2);
+    background:rgba(0,0,0,.4);
+    font-size:15px;line-height:1.65;color:#F0F0E8;
+  }
+  .credits a{color:#C8FF00;text-decoration:none;border-bottom:1px solid rgba(200,255,0,.3)}
+  .credits a:hover{border-bottom-color:#C8FF00}
+  .credits strong{color:#C8FF00;font-weight:600}
+
+  .footer{
+    margin-top:60px;display:flex;justify-content:space-between;align-items:center;
+    font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.15em;
+    text-transform:uppercase;color:#F0F0E8;opacity:.4;
+  }
+</style>
+</head>
+<body>
+
+<section class="page">
+  <canvas id="matrix-canvas"></canvas>
+  <div class="overlay"></div>
+
+  <div class="inner">
+    <span class="br-tr"></span><span class="br-bl"></span>
+
+    <a href="/" class="back">&larr; Back</a>
+
+    <div class="uptitle">Aging.fyi &middot; Quick start guide</div>
+    <h1 class="title">Aging is<br>not destiny.</h1>
+    <p class="lede">A quick start guide for the longevity industry and your place in it. Aging is the root cause of most human suffering and death, and it is malleable. Here&rsquo;s what the science says, what to do about it, and how to refute the usual objections.</p>
+
+    <div class="content">
+
+      <h2>Aging is malleable</h2>
+      <div class="sub">According to current science</div>
+      <p>Both human<sup><a href="https://www.age.mpg.de/can-ageing-be-slowed-down" target="_blank" rel="noopener">1</a>,<a href="https://www.sciencedirect.com/science/article/abs/pii/S1043276022000170" target="_blank" rel="noopener">2</a>,<a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10231756/" target="_blank" rel="noopener">3</a></sup> and animal<sup><a href="https://genomics.senescence.info/drugs/" target="_blank" rel="noopener">4</a></sup> data show that aging can be slowed down. There are species that do not age<sup><a href="https://portlandpress.com/biochemsoctrans/article-abstract/47/4/1157/219691/Long-lived-animals-with-negligible-senescence" target="_blank" rel="noopener">5</a></sup>, and some subspecies age 10x+ slower than their close relatives<sup><a href="https://www.nature.com/articles/nature12789" target="_blank" rel="noopener">6</a></sup>. There is no fundamental law of biology preventing us from making humans a negligible aging species<sup><a href="https://pubmed.ncbi.nlm.nih.gov/28849291" target="_blank" rel="noopener">7</a>,<a href="https://www.demogr.mpg.de/papers/working/wp-2004-002.pdf" target="_blank" rel="noopener">8</a></sup>.</p>
+
+      <h2>Why target aging</h2>
+      <div class="sub">And not diseases</div>
+      <p>Aging is either the root cause or an important factor in 10 out of 10 leading causes of death worldwide<sup><a href="https://www.who.int/news-room/fact-sheets/detail/the-top-10-causes-of-death" target="_blank" rel="noopener">9</a>,<a href="https://www.frontiersin.org/journals/medicine/articles/10.3389/fmed.2018.00061/full" target="_blank" rel="noopener">10</a>,<a href="https://pubmed.ncbi.nlm.nih.gov/33502634/" target="_blank" rel="noopener">11</a></sup>. Under the current paradigm humanity spends 10% of world GDP, about $9.8 trillion<sup><a href="https://www.weforum.org/agenda/2024/08/healthcare-costs-digital-tech/" target="_blank" rel="noopener">12</a></sup>, on health, and the bulk of this enormous sum goes to treating age-related and chronic diseases. If just a fraction of this money went to longevity biotech R&amp;D, the world would be a much healthier place. Fight the cause, not the symptoms.</p>
+
+      <h2>How you can contribute</h2>
+      <div class="sub">Yes, you. To accelerate longevity biotech</div>
+
+      <div class="acc">
+
+        <details>
+          <summary>Switch career or contribute part-time</summary>
+          <div class="acc-body">
+            <ul>
+              <li>Apply to and learn at <a href="https://www.longbiofellowship.org/" target="_blank" rel="noopener">Longevity Biotech Fellowship</a></li>
+              <li>Join <a href="https://vitalism.io/" target="_blank" rel="noopener">Vitalism Movement</a></li>
+              <li>Learn at <a href="https://longevity-degree.teachable.com/p/investing-in-longevity-course-ilc" target="_blank" rel="noopener">Longevity Education Hub</a></li>
+              <li>Learn at <a href="https://longevityacademy.sg/" target="_blank" rel="noopener">The Academy for Healthy Longevity</a> at the National University of Singapore</li>
+              <li>Volunteer at <a href="https://sayforever.org/" target="_blank" rel="noopener">SayForever</a></li>
+            </ul>
+          </div>
+        </details>
+
+        <details>
+          <summary>Join an academic lab</summary>
+          <div class="acc-body">
+            <h4>Europe</h4>
+            <ul>
+              <li><a href="https://www.age.mpg.de/en" target="_blank" rel="noopener">Max Planck Institute for Biology of Ageing</a></li>
+              <li><a href="https://www.leibniz-fli.de/" target="_blank" rel="noopener">Leibniz Institute on Aging (FLI)</a></li>
+              <li><a href="https://www.cha-mainz.de/en/research" target="_blank" rel="noopener">Centre for Healthy Ageing</a> at University Medical Centre Mainz</li>
+              <li><a href="https://rejuvenomicslab.com/" target="_blank" rel="noopener">Jo&atilde;o Pedro de Magalh&atilde;es Lab</a>, University of Birmingham</li>
+              <li><a href="https://www.cecad.uni-koeln.de/research/research-areas" target="_blank" rel="noopener">CECAD</a>, Cologne</li>
+              <li><a href="https://www.ocampolab.com/" target="_blank" rel="noopener">Ocampo Lab</a>, University of Lausanne</li>
+              <li><a href="https://scheibye-knudsen.com/" target="_blank" rel="noopener">Scheibye-Knudsen Group</a> at University of Copenhagen</li>
+              <li><a href="https://umcgresearch.org/w/eriba" target="_blank" rel="noopener">ERIBA</a>, European Research Institute for the Biology of Ageing</li>
+              <li><a href="https://ibima.med.uni-rostock.de/" target="_blank" rel="noopener">Institute for Biostatistics and Informatics in Medicine and Ageing Research</a>, University of Rostock</li>
+            </ul>
+            <h4>United States</h4>
+            <ul>
+              <li><a href="https://www.nia.nih.gov/research/labs" target="_blank" rel="noopener">National Institute on Aging</a></li>
+              <li><a href="https://gladyshevlab.bwh.harvard.edu/" target="_blank" rel="noopener">Gladyshev lab</a>, Harvard Medical School</li>
+              <li><a href="https://sinclair.hms.harvard.edu/" target="_blank" rel="noopener">Sinclair lab</a>, Harvard Medical School</li>
+              <li><a href="https://churchlab.hms.harvard.edu/" target="_blank" rel="noopener">Church lab</a>, Harvard Medical School</li>
+              <li><a href="https://www.buckinstitute.org/" target="_blank" rel="noopener">Buck Institute for Research on Aging</a></li>
+              <li><a href="https://einsteinmed.edu/faculty/484/nir-barzilai" target="_blank" rel="noopener">Nir Barzilai lab</a>, Albert Einstein College of Medicine</li>
+              <li><a href="https://med.stanford.edu/sebastiano.html" target="_blank" rel="noopener">Sebastiano lab</a>, Stanford University School of Medicine</li>
+              <li><a href="https://web.stanford.edu/group/brunet/" target="_blank" rel="noopener">Brunet lab</a>, Stanford University School of Medicine</li>
+              <li><a href="https://medicine.yale.edu/yage/" target="_blank" rel="noopener">Yale Center for Research on Aging</a></li>
+              <li><a href="https://www.sas.rochester.edu/bio/labs/gorbunova/" target="_blank" rel="noopener">Gorbunova &amp; Seluanov lab</a>, University of Rochester</li>
+              <li><a href="https://www.roswellpark.org/andrei-gudkov" target="_blank" rel="noopener">Gudkov Cell Stress Biology Department</a> at Roswell Park</li>
+            </ul>
+            <h4>Asia</h4>
+            <ul>
+              <li><a href="https://coe.nuhs.edu.sg/Centre-for-Healthy-Longevity/Pages/default.aspx" target="_blank" rel="noopener">Centre for Healthy Longevity</a> at National University of Singapore</li>
+            </ul>
+          </div>
+        </details>
+
+        <details>
+          <summary>Donate to non-profits and charities</summary>
+          <div class="acc-body">
+            <ul>
+              <li><a href="https://www.lifespan.io/" target="_blank" rel="noopener">Lifespan.io</a></li>
+              <li><a href="https://www.buckinstitute.org/" target="_blank" rel="noopener">Buck Institute for Research on Aging</a></li>
+              <li><a href="https://www.levf.org/" target="_blank" rel="noopener">Longevity Escape Velocity Foundation</a></li>
+              <li><a href="https://longevity.foundation/" target="_blank" rel="noopener">Longevity Science Foundation</a></li>
+              <li><a href="https://openlongevity.org/home/test" target="_blank" rel="noopener">Open Longevity</a></li>
+              <li><a href="https://www.mfoundation.org/" target="_blank" rel="noopener">Methuselah Foundation</a></li>
+              <li><a href="https://www.longevityisrael.org/" target="_blank" rel="noopener">Vetek (Seniority) Association</a></li>
+              <li><a href="https://rejuvenomicslab.com/" target="_blank" rel="noopener">Genomics of Aging and Rejuvenation Lab</a></li>
+              <li><a href="https://bsra.org.uk/" target="_blank" rel="noopener">British Society for Research on Ageing</a></li>
+              <li><a href="https://a4li.org/" target="_blank" rel="noopener">The Alliance for Longevity Initiatives (A4LI)</a></li>
+              <li><a href="https://www.afar.org/" target="_blank" rel="noopener">American Federation for Aging Research</a></li>
+              <li><a href="https://dogagingproject.org/" target="_blank" rel="noopener">The Dog Aging Project</a></li>
+              <li><a href="https://impetusgrants.org/" target="_blank" rel="noopener">Impetus Grants</a></li>
+            </ul>
+          </div>
+        </details>
+
+        <details>
+          <summary>Look for jobs or invest in longevity biotech</summary>
+          <div class="acc-body">
+            <ul>
+              <li>Company list at <a href="https://longevitylist.com/longevity-industry-database/" target="_blank" rel="noopener">Longevity List</a></li>
+              <li>Company list at <a href="https://agingbiotech.info/companies/" target="_blank" rel="noopener">Agingbiotech.info</a></li>
+              <li>Company list at <a href="https://spannr.com/companies" target="_blank" rel="noopener">Spannr</a></li>
+            </ul>
+          </div>
+        </details>
+
+        <details>
+          <summary>Read and share news</summary>
+          <div class="acc-body">
+            <ul>
+              <li>New discoveries at <a href="https://www.lifespan.io/news-main/" target="_blank" rel="noopener">Lifespan.io</a></li>
+              <li>New discoveries and opinion at <a href="https://www.fightaging.org/" target="_blank" rel="noopener">FightAging.org</a></li>
+              <li>Startups and business at <a href="https://longevity.technology/" target="_blank" rel="noopener">Longevity.technology</a></li>
+              <li>Business and personal longevity at <a href="https://spannr.com/" target="_blank" rel="noopener">Spannr</a></li>
+            </ul>
+          </div>
+        </details>
+
+        <details>
+          <summary>Overall great resources with plentiful data</summary>
+          <div class="acc-body">
+            <ul>
+              <li><a href="https://agingbiotech.info/" target="_blank" rel="noopener">Agingbiotech.info</a></li>
+              <li><a href="https://www.longbiofellowship.org/" target="_blank" rel="noopener">Longevity Biotech Fellowship</a></li>
+              <li><a href="https://www.fightaging.org/" target="_blank" rel="noopener">FightAging.org</a></li>
+            </ul>
+          </div>
+        </details>
+
+      </div>
+
+      <h2>Common objections</h2>
+      <div class="sub">To life extension, and how to refute them</div>
+
+      <div class="acc">
+
+        <details>
+          <summary>Only rich people will be able to afford life extension treatments</summary>
+          <div class="acc-body">
+            <p>Nathan Mayer Rothschild, Europe&rsquo;s richest man at the time, died in 1836 of a simple infection that could have been easily treated with penicillin a century later. The cost of medical treatments plummets with economies of scale and technological refinement, and there is no reason to expect that life extension should be an exception. Dystopian sci-fi such as Elysium or Altered Carbon might be entertaining, but has historically failed to predict reality.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>Living for eternity will be boring</summary>
+          <div class="acc-body">
+            <p>Life extension is about giving people choices, not &ldquo;forcing&rdquo; anyone to live against their own will. If or when you get tired of it all, you can check out permanently or freeze yourself for a few centuries. But imposing an arbitrary execution date on every last human? That sounds rather psychopathic.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>I don&rsquo;t want to spend centuries rotting away on life support</summary>
+          <div class="acc-body">
+            <p>The entire point of life extension is to multiply healthy lifespans, which implies sustainably high physical and mental function. People on life support are not healthy, being at risk of death from trivial infections. Aubrey de Grey calls the notion that the world ends up in a &ldquo;global nursing home&rdquo; the Tithonus Error.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>There are so many other problems we could spend the money on</summary>
+          <div class="acc-body">
+            <p>Almost no money is spent on life extension research, whereas solving it will entail gargantuan savings from much lower healthcare and pensions spending. These savings can go towards tax cuts, foreign aid, space research, or whatever else you care about.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>But who will pay the pensions?</summary>
+          <div class="acc-body">
+            <p>In a society where most people have the brains and bodies of 25-year-olds there will be no need for pensions.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>What about overpopulation?</summary>
+          <div class="acc-body">
+            <p>The main driver of population growth is births, not deaths. And the defining feature of global demographics today isn&rsquo;t runaway population growth, but fertility collapse, which has spread beyond the First World and East Asia to now encompass most of Latin America, India, and even parts of the Middle East. At least so far as the 21st century is concerned, life extension will avert population decline in the developed world and reverse its soaring dependency ratios.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>Wouldn&rsquo;t a population of cognitively old people stall innovation and moral progress?</summary>
+          <div class="acc-body">
+            <p>This essentially equates to sentencing people to death on account of allegedly regressive moral views held by their age group. Not only is this morally dubious, it will also be irrelevant in practice. Brain rejuvenation will be part and parcel of any comprehensive life extension solution. Not only will old people preserve their accumulated stock of knowledge and experience, but they will regain the fluid intelligence and capacity for learning of youth. The result will, if anything, be an explosion in creativity and innovation.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>What about eternal dictators?</summary>
+          <div class="acc-body">
+            <p>It is unclear why life extension should privilege dictators over democracies. Although dictators might no longer die of aging, they would remain vulnerable to accidents, coups, and assassinations. Long-lived dictators, surviving ones at any rate, might also be expected to exercise greater caution, avoiding wars and totalitarian excesses that mobilize coalitions against them. Finally, life under almost any dictatorship is preferable to death: just avoid talking about politics, and/or emigrate.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>Life extension breaks our organic links with our ancestors and devalues our connection with the future</summary>
+          <div class="acc-body">
+            <p>In reality, not rhetoric, we steeply discount the welfare of our distant descendants. Life extension gives us a direct stake, skin in the game, in the long-term health of our civilization and global environmental sustainability. A society of immortalists will by definition be a society of longtermists.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>Death gives meaning to life</summary>
+          <div class="acc-body">
+            <p>To paraphrase Patrick Hayden, life extension raises serious philosophical issues, and resolving these issues may require many centuries.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>Life extension short-circuits evolution</summary>
+          <div class="acc-body">
+            <p>We short-circuited evolution when we escaped the Malthusian trap after the Industrial Revolution. You can be consistent and argue for a return to subsistence agriculture, but I for one prefer not dying from cholera.</p>
+          </div>
+        </details>
+
+      </div>
+
+      <div class="refs">
+        <h2>References</h2>
+        <ol>
+          <li><a href="https://www.age.mpg.de/can-ageing-be-slowed-down" target="_blank" rel="noopener">Max Planck Institute &mdash; Can ageing be slowed down?</a></li>
+          <li><a href="https://www.sciencedirect.com/science/article/abs/pii/S1043276022000170" target="_blank" rel="noopener">Trends in Endocrinology &amp; Metabolism &mdash; Slowing aging in humans</a></li>
+          <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10231756/" target="_blank" rel="noopener">PMC10231756 &mdash; Interventions to slow human aging</a></li>
+          <li><a href="https://genomics.senescence.info/drugs/" target="_blank" rel="noopener">DrugAge &mdash; Database of geroprotective compounds</a></li>
+          <li><a href="https://portlandpress.com/biochemsoctrans/article-abstract/47/4/1157/219691/Long-lived-animals-with-negligible-senescence" target="_blank" rel="noopener">Biochem Soc Trans &mdash; Long-lived animals with negligible senescence</a></li>
+          <li><a href="https://www.nature.com/articles/nature12789" target="_blank" rel="noopener">Nature &mdash; Naked mole-rat longevity</a></li>
+          <li><a href="https://pubmed.ncbi.nlm.nih.gov/28849291" target="_blank" rel="noopener">PubMed 28849291 &mdash; No upper limit on human lifespan</a></li>
+          <li><a href="https://www.demogr.mpg.de/papers/working/wp-2004-002.pdf" target="_blank" rel="noopener">MPIDR Working Paper 2004-002 &mdash; Mortality plateau</a></li>
+          <li><a href="https://www.who.int/news-room/fact-sheets/detail/the-top-10-causes-of-death" target="_blank" rel="noopener">WHO &mdash; Top 10 causes of death</a></li>
+          <li><a href="https://www.frontiersin.org/journals/medicine/articles/10.3389/fmed.2018.00061/full" target="_blank" rel="noopener">Frontiers in Medicine &mdash; Aging as a disease</a></li>
+          <li><a href="https://pubmed.ncbi.nlm.nih.gov/33502634/" target="_blank" rel="noopener">PubMed 33502634 &mdash; Aging and chronic disease</a></li>
+          <li><a href="https://www.weforum.org/agenda/2024/08/healthcare-costs-digital-tech/" target="_blank" rel="noopener">World Economic Forum &mdash; Global healthcare spending</a></li>
+        </ol>
+      </div>
+
+      <div class="credits">
+        Originally published as <strong>Aging.fyi</strong>. Contributors: <a href="https://stryg.in/" target="_blank" rel="noopener">Alexey Strygin</a>, <a href="https://stephanh84.github.io/" target="_blank" rel="noopener">Stephan H&auml;hne</a>, <a href="https://akarlin.com/" target="_blank" rel="noopener">Anatoly Karlin</a>, <a href="https://www.linkedin.com/in/ferdinando-randisi" target="_blank" rel="noopener">Ferdinando Randisi</a>. Did we miss something? Found a bug? <a href="mailto:alexey.strygin@gmail.com">Send feedback</a>.
+      </div>
+
+    </div>
+
+    <footer class="footer">
+      <span>&copy; 2026 Alexey Strygin</span>
+      <span>STRYG.IN</span>
+    </footer>
+  </div>
+</section>
+
+<script>
+  (function(){
+    const c = document.getElementById('matrix-canvas');
+    const ctx = c.getContext('2d');
+    const chars = 'AGCTAGCTAGCTAGCT'.split('');
+    const fontSize = 14;
+    const color = '#C8FF00';
+    let cols=0, drops=[];
+    function resize(){
+      c.width=window.innerWidth; c.height=window.innerHeight;
+      cols=Math.floor(c.width/fontSize);
+      drops=Array.from({length:cols},()=>Math.floor(Math.random()*-100));
+    }
+    resize(); window.addEventListener('resize',resize);
+    let last=0;
+    function draw(ts){
+      if(ts-last>50){
+        last=ts;
+        ctx.fillStyle='rgba(0,0,0,0.06)';
+        ctx.fillRect(0,0,c.width,c.height);
+        ctx.font=fontSize+'px JetBrains Mono, monospace';
+        for(let i=0;i<drops.length;i++){
+          const t=chars[Math.floor(Math.random()*chars.length)];
+          const x=i*fontSize, y=drops[i]*fontSize;
+          if(Math.random()>0.98){
+            ctx.fillStyle='#ffffff';
+            ctx.shadowColor='#ffffff'; ctx.shadowBlur=8;
+          } else {
+            ctx.fillStyle=color; ctx.shadowBlur=0;
+          }
+          ctx.fillText(t,x,y);
+          ctx.shadowBlur=0;
+          if(y>c.height && Math.random()>0.975) drops[i]=0;
+          drops[i]++;
+        }
+      }
+      requestAnimationFrame(draw);
+    }
+    requestAnimationFrame(draw);
+  })();
+</script>
+</body>
+</html>
