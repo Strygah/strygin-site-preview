@@ -32,16 +32,6 @@
   }
   @media(max-width:768px){.inner{padding:80px 24px 40px}}
 
-  /* corner brackets */
-  .inner::before,.inner::after{
-    content:"";position:fixed;width:22px;height:22px;
-    border:0 solid #C8FF00;pointer-events:none;z-index:5;
-  }
-  .inner::before{top:20px;left:20px;border-top-width:2px;border-left-width:2px}
-  .inner::after{bottom:20px;right:20px;border-bottom-width:2px;border-right-width:2px}
-  .br-tr{position:fixed;top:20px;right:20px;width:22px;height:22px;border-top:2px solid #C8FF00;border-right:2px solid #C8FF00;pointer-events:none;z-index:5}
-  .br-bl{position:fixed;bottom:20px;left:20px;width:22px;height:22px;border-bottom:2px solid #C8FF00;border-left:2px solid #C8FF00;pointer-events:none;z-index:5}
-
   .back{
     font-family:'Space Mono',monospace;font-size:13px;
     color:#C8FF00;opacity:.7;letter-spacing:.1em;text-transform:uppercase;
@@ -145,6 +135,28 @@
   th.c,td.c{text-align:center}
   td code{font-size:.85em}
 
+  /* embedded X post — styles below apply to the pre-widget blockquote only,
+     so they act as the fallback card if platform.x.com is blocked
+     (Brave Shields, tracker blockers). The rendered widget is an iframe. */
+  /* flow-root: the rendered widget wrapper is floated by X in some
+     configurations; without containment it collapses this box to 0 height
+     and the next heading overlaps the tweet. */
+  .embed{margin:8px 0 40px;max-width:560px;display:flow-root}
+  .embed blockquote.twitter-tweet{
+    margin:0;padding:20px 22px;
+    background:rgba(200,255,0,.04);
+    border:1px solid rgba(200,255,0,.18);
+    border-left:2px solid #C8FF00;border-radius:4px;
+    font-family:'Space Mono',monospace;font-size:13px;line-height:1.8;
+    color:#F0F0E8;
+  }
+  .embed blockquote.twitter-tweet p{margin:0 0 6px;font-size:13px;line-height:1.8}
+  .embed blockquote.twitter-tweet a{
+    color:#C8FF00;text-decoration:none;
+    border-bottom:1px solid rgba(200,255,0,.35);word-break:break-word;
+  }
+  .embed blockquote.twitter-tweet a:hover{border-bottom-color:#C8FF00}
+
   .footer{
     margin-top:60px;display:flex;justify-content:space-between;align-items:center;
     gap:16px;flex-wrap:wrap;
@@ -160,8 +172,6 @@
   <div class="overlay"></div>
 
   <div class="inner">
-    <span class="br-tr"></span><span class="br-bl"></span>
-
     <a href="/" class="back">&larr; Back</a>
 
     <h1 class="title">Are We on Track<br>for LEV: Methodology</h1>
@@ -176,6 +186,10 @@
       </div>
 
       <p>This document explains the calculations behind the article and its figures. It also traces the quantitative claims that appear in the text without hyperlinks. The projections are benchmarks and thought experiments, not forecasts.</p>
+
+      <div class="embed">
+<blockquote class="twitter-tweet" data-theme="dark" data-dnt="true"><p lang="zxx" dir="ltr"><a href="https://t.co/FpHwpTLH1l">https://t.co/FpHwpTLH1l</a></p>&mdash; Alexey Strygin (@strygah) <a href="https://x.com/strygah/status/2084247124963651865?ref_src=twsrc%5Etfw">August 3, 2026</a></blockquote>
+</div>
 
       <h2>1. Methodology</h2>
 
@@ -564,6 +578,7 @@ work/render_chart_g_corrected_comparison.py</code></pre>
   </div>
 </section>
 
+<script async src="https://platform.x.com/widgets.js" charset="utf-8"></script>
 <script>
   (function(){
     const c = document.getElementById('matrix-canvas');
