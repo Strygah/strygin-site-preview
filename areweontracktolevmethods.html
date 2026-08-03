@@ -1,0 +1,609 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Are We on Track for LEV: Methodology &mdash; Alexey Strygin</title>
+<meta name="description" content="Methodology and source notes behind &ldquo;Are we on track for Longevity Escape Velocity?&rdquo; &mdash; how the top-five longevity frontier, its acceleration and the mortality decline equivalent to LEV were calculated from UN World Population Prospects 2024.">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@500;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;background:#000;color:#fff;-webkit-font-smoothing:antialiased}
+  a{color:inherit}
+  img{display:block;max-width:100%}
+
+  .page{
+    background:#000;color:#F0F0E8;
+    font-family:'Space Grotesk',sans-serif;
+    min-height:100vh;position:relative;overflow:hidden;
+  }
+
+  #matrix-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0}
+  .overlay{
+    position:fixed;inset:0;z-index:1;pointer-events:none;
+    background:radial-gradient(ellipse at center,rgba(0,0,0,.7) 0%,rgba(0,0,0,.88) 60%,rgba(0,0,0,.95) 100%);
+  }
+
+  .inner{
+    position:relative;z-index:3;padding:100px 80px 80px;
+  }
+  @media(max-width:768px){.inner{padding:80px 24px 40px}}
+
+  /* corner brackets */
+  .inner::before,.inner::after{
+    content:"";position:fixed;width:22px;height:22px;
+    border:0 solid #C8FF00;pointer-events:none;z-index:5;
+  }
+  .inner::before{top:20px;left:20px;border-top-width:2px;border-left-width:2px}
+  .inner::after{bottom:20px;right:20px;border-bottom-width:2px;border-right-width:2px}
+  .br-tr{position:fixed;top:20px;right:20px;width:22px;height:22px;border-top:2px solid #C8FF00;border-right:2px solid #C8FF00;pointer-events:none;z-index:5}
+  .br-bl{position:fixed;bottom:20px;left:20px;width:22px;height:22px;border-bottom:2px solid #C8FF00;border-left:2px solid #C8FF00;pointer-events:none;z-index:5}
+
+  .back{
+    font-family:'Space Mono',monospace;font-size:13px;
+    color:#C8FF00;opacity:.7;letter-spacing:.1em;text-transform:uppercase;
+    text-decoration:none;display:inline-flex;align-items:center;gap:8px;
+    margin-bottom:40px;transition:opacity .2s;
+  }
+  .back:hover{opacity:1}
+
+  .title{
+    font-family:'Onest',sans-serif;font-weight:800;
+    font-size:clamp(32px,5.2vw,68px);line-height:.95;
+    letter-spacing:-.02em;text-transform:uppercase;color:#C8FF00;
+    text-shadow:0 0 40px rgba(200,255,0,.25),0 0 80px rgba(200,255,0,.1);
+    margin-bottom:14px;
+  }
+  .subtitle{
+    font-family:'Space Mono',monospace;font-size:13px;letter-spacing:.18em;
+    text-transform:uppercase;color:#F0F0E8;opacity:.55;margin-bottom:36px;
+  }
+
+  .content{max-width:820px}
+
+  .meta{
+    border-left:2px solid rgba(200,255,0,.45);
+    padding:14px 0 14px 20px;margin-bottom:36px;
+    font-family:'Space Mono',monospace;font-size:13px;line-height:1.85;
+    color:#F0F0E8;opacity:.8;
+  }
+  .meta b{color:#C8FF00;font-weight:700}
+
+  .content h2{
+    font-family:'Onest',sans-serif;font-weight:800;
+    font-size:24px;text-transform:uppercase;color:#C8FF00;
+    letter-spacing:-.01em;margin:56px 0 20px;line-height:1.1;
+  }
+  .content h3{
+    font-family:'Onest',sans-serif;font-weight:700;
+    font-size:18px;color:#F0F0E8;letter-spacing:-.01em;
+    margin:38px 0 14px;line-height:1.25;
+  }
+  .content h4{
+    font-family:'Space Mono',monospace;font-weight:700;
+    font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+    color:#C8FF00;opacity:.75;margin:28px 0 12px;
+  }
+  .content h2:first-child,.content h3:first-child{margin-top:0}
+
+  .content p{font-size:17px;line-height:1.65;color:#F0F0E8;margin-bottom:16px}
+  .content strong{color:#C8FF00;font-weight:600}
+  .content em{font-style:italic;opacity:.85}
+
+  .content a[href]{
+    color:#C8FF00;text-decoration:none;
+    border-bottom:1px solid rgba(200,255,0,.35);
+    transition:border-color .2s;
+  }
+  .content a[href]:hover{border-bottom-color:#C8FF00}
+
+  .content ul,.content ol{
+    margin:12px 0 16px 0;padding-left:24px;
+    font-size:17px;line-height:1.65;color:#F0F0E8;
+  }
+  .content li{margin-bottom:8px}
+  .content li::marker{color:#C8FF00}
+
+  code{
+    font-family:'JetBrains Mono','Space Mono',monospace;
+    font-size:.88em;color:#C8FF00;
+    background:rgba(200,255,0,.08);
+    border:1px solid rgba(200,255,0,.16);
+    border-radius:3px;padding:1px 5px;
+    word-break:break-word;
+  }
+  pre{
+    margin:0 0 20px;padding:18px 20px;
+    background:rgba(200,255,0,.04);
+    border:1px solid rgba(200,255,0,.18);
+    border-left:2px solid #C8FF00;
+    border-radius:4px;overflow-x:auto;
+  }
+  pre code{
+    background:none;border:0;padding:0;border-radius:0;
+    font-size:13px;line-height:1.65;color:#C8FF00;
+    white-space:pre;word-break:normal;
+  }
+
+  .tablewrap{overflow-x:auto;margin:0 0 24px;
+    border:1px solid rgba(200,255,0,.18);border-radius:4px}
+  table{border-collapse:collapse;width:100%;min-width:520px;
+    font-size:14px;line-height:1.5}
+  th,td{padding:10px 14px;text-align:left;vertical-align:top;
+    border-bottom:1px solid rgba(200,255,0,.12)}
+  th{font-family:'Space Mono',monospace;font-size:11px;
+    letter-spacing:.1em;text-transform:uppercase;
+    color:#C8FF00;background:rgba(200,255,0,.06);
+    border-bottom:1px solid rgba(200,255,0,.28);white-space:nowrap}
+  td{color:#F0F0E8;opacity:.9}
+  tbody tr:last-child td{border-bottom:0}
+  tbody tr:hover td{background:rgba(200,255,0,.03)}
+  th.r,td.r{text-align:right}
+  th.c,td.c{text-align:center}
+  td code{font-size:.85em}
+
+  .footer{
+    margin-top:60px;display:flex;justify-content:space-between;align-items:center;
+    gap:16px;flex-wrap:wrap;
+    font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.15em;
+    text-transform:uppercase;color:#F0F0E8;opacity:.4;
+  }
+</style>
+</head>
+<body>
+
+<section class="page">
+  <canvas id="matrix-canvas"></canvas>
+  <div class="overlay"></div>
+
+  <div class="inner">
+    <span class="br-tr"></span><span class="br-bl"></span>
+
+    <a href="/" class="back">&larr; Back</a>
+
+    <h1 class="title">Are We on Track<br>for LEV: Methodology</h1>
+    <p class="subtitle">Methodology and source notes</p>
+
+    <div class="content">
+      <div class="meta">
+        <b>Analysis version:</b> 3 August 2026<br>
+        <b>Historical endpoint:</b> 2023<br>
+        <b>Primary demographic source:</b> United Nations World Population Prospects 2024<br>
+        <b>Companion article:</b> <a href="https://strygin.substack.com/p/7bf83197-5e4a-4b92-9d56-3bd2035a5377" target="_blank" rel="noopener">Are we on track for Longevity Escape Velocity?</a>
+      </div>
+
+      <p>This document explains the calculations behind the article and its figures. It also traces the quantitative claims that appear in the text without hyperlinks. The projections are benchmarks and thought experiments, not forecasts.</p>
+
+      <h2>1. Methodology</h2>
+
+      <h3>1.1 Research question</h3>
+
+      <p>The analysis asks two related questions:</p>
+
+      <ol><li>How quickly has the best-observed human longevity frontier advanced since 1950?</li><li>How far is that rate from longevity escape velocity (LEV)?</li></ol>
+
+      <p>LEV is operationalized as the point at which expected age at death advances by one year for every calendar year that passes. In the units used in the figures, this is:</p>
+
+      <pre><code>LEV threshold = 1 expected-age year per calendar year
+              = 10 expected-age years per calendar decade</code></pre>
+
+      <p>Exactly one year per year stops remaining life expectancy from shrinking as time passes. A rate above one year per year makes it grow. The article sometimes says &ldquo;more than ten years per decade&rdquo;; this is the same condition expressed on a ten-year scale.</p>
+
+      <p>This is a simplified, population-level definition. It does not assert biological immortality, and it does not by itself establish that any living cohort has reached LEV.</p>
+
+      <h3>1.2 Data</h3>
+
+      <p>The main analysis uses the United Nations Department of Economic and Social Affairs, Population Division, <strong>World Population Prospects 2024</strong> (WPP 2024):</p>
+
+      <ul><li>abridged period life tables;</li><li>population by five-year age group and sex;</li><li>Medium variant;</li><li>historical estimates for 1950-2023;</li><li>WPP records classified as <code>Country/Area</code>.</li></ul>
+
+      <p>The two source files are:</p>
+
+      <pre><code>work/WPP2024_Life_Table_Abridged_Medium_1950-2023.csv.gz
+work/WPP2024_Population1JanuaryByAge5GroupSex_Medium.csv.gz</code></pre>
+
+      <p>WPP combines observed vital-registration data with demographic estimation. Data quality is stronger in some countries and years than in others, and old-age estimates are especially uncertain. The <a href="https://www.un.org/development/desa/pd/content/world-population-prospects-2024-methodology-report" target="_blank" rel="noopener">WPP 2024 methodology report</a> documents the UN&rsquo;s empirical and model-based procedures.</p>
+
+      <h3>1.3 Period life tables, not cohort forecasts</h3>
+
+      <p>All life-expectancy values are <strong>period</strong> life-table measures. They describe a hypothetical person exposed throughout life to the age-specific mortality rates observed or estimated in one calendar year.</p>
+
+      <p>They are not forecasts of the realized lifespan of a person born in that year. When mortality is improving, a real cohort may experience different rates as it ages.</p>
+
+      <h3>1.4 Expected age at death</h3>
+
+      <p>Life expectancy at age <code>a</code>, written <code>e(a)</code>, is the expected number of remaining years conditional on already reaching age <code>a</code>. To place every age on one intuitive scale, the figures use:</p>
+
+      <pre><code>expected age at death at age a = a + e(a)</code></pre>
+
+      <p>For example, ten remaining years at age 80 becomes an expected age at death of 90.</p>
+
+      <p>The main expected-age figures use starting ages 0, 30, 50, 70, 80 and 90. The rolling-progress figure additionally includes age 60.</p>
+
+      <h3>1.5 Equal weighting of male and female life tables</h3>
+
+      <p>For every country or area, year and starting age, male and female outcomes are averaged with equal weight:</p>
+
+      <pre><code>sex-neutral expected age at death
+  = (male expected age at death + female expected age at death) / 2</code></pre>
+
+      <p>The same equal weighting is used for age-specific death rates in the mortality analysis.</p>
+
+      <p>This differs from the WPP combined-sex life table. At advanced ages, the combined-sex measure is weighted toward women because more women survive to those ages. Equal weighting was chosen because the analysis is intended to track changes in mortality conditions rather than changes in the sex composition of survivors.</p>
+
+      <h3>1.6 Eligibility filters</h3>
+
+      <p>For the expected-age frontier, a country or area is eligible only when:</p>
+
+      <pre><code>total population &gt;= 1,000,000</code></pre>
+
+      <p>For the age-80 and age-90 expected-age lines, it must also have:</p>
+
+      <pre><code>population at or above the starting age &gt;= 25,000</code></pre>
+
+      <p>The WPP population files report people in thousands, so the corresponding code thresholds are <code>1000.0</code> and <code>25.0</code>.</p>
+
+      <p>These rules reduce instability from very small populations and sparse old-age survivor counts. They do not eliminate measurement error.</p>
+
+      <h3>1.7 The dynamic top-five frontier</h3>
+
+      <p>The frontier is recalculated every year. For each year and each starting age:</p>
+
+      <ol><li>Calculate equal-weight male/female expected age at death for every eligible country or area.</li><li>Rank the eligible observations from highest to lowest.</li><li>Select the top five.</li><li>Report the median of those five values.</li></ol>
+
+      <p>Because five is odd, the frontier is the third-ranked observation:</p>
+
+      <pre><code>frontier(year, age)
+  = median(top five eligible expected ages at death)</code></pre>
+
+      <p>The top-five set can therefore change across years and across starting ages. The resulting series represents a moving best-practice frontier, not the history of one fixed group of countries.</p>
+
+      <h4>Why top five and why the median?</h4>
+
+      <p>A single-country maximum is highly sensitive to one noisy country-year, particularly at age 90. A broad average of many high-performing countries is more stable but less clearly a frontier. The median of the top five is a compromise: it remains best-in-class while requiring the result to be shared by at least three observations.</p>
+
+      <p>The median is preferred to the mean because one extreme estimate can pull the mean upward. With a top-five median, the first- and second-ranked values cannot change the reported frontier unless they also alter the third rank.</p>
+
+      <h3>1.8 Two related frontier constructions</h3>
+
+      <p>The article uses two constructions for two different purposes.</p>
+
+      <h4>Expected-age figures</h4>
+
+      <p>The historical, projection, rolling-progress and time-to-LEV figures re-rank the top five <strong>separately for each starting age</strong>. This answers: &ldquo;What was the best-observed expected age at death among sufficiently large populations for a person who had already reached this age?&rdquo;</p>
+
+      <h4>Mortality-schedule figures</h4>
+
+      <p>The mortality figures need one internally coherent set of age-specific death rates. For each year, countries are therefore ranked by equal-weight expected age at death <strong>at birth</strong>; the top five countries are selected once; and the median equal-weight death rate is calculated at every age for those same five countries.</p>
+
+      <p>In 2023 this coherent mortality frontier contains Hong Kong, Japan, the Republic of Korea, Switzerland and Australia.</p>
+
+      <p>Re-ranking countries independently at every age would splice death rates from different country sets into one schedule. Such a curve could not be interpreted as a life table, and calculations of expected age at death from it would be internally inconsistent.</p>
+
+      <p>The coherent mortality schedule uses the total-population threshold of one million. The additional age-80/90 population filter belongs to the age-specific expected-age frontier and is not applied to this birth-ranked schedule.</p>
+
+      <h3>1.9 Figure 1: historical frontier, current trend and LEV ramp</h3>
+
+      <p>For each starting age, an ordinary least-squares (OLS) line is fitted to the annual frontier values from 1950 through 2023:</p>
+
+      <pre><code>frontier expected age at death = intercept + slope * year</code></pre>
+
+      <p>The slope is multiplied by ten and reported as years gained per decade.</p>
+
+      <div class='tablewrap'><table><thead><tr><th class="r">Starting age</th><th class="r">1950 frontier</th><th class="r">2023 frontier</th><th class="r">Fitted 1950-2023 trend</th><th class="r">Multiple to LEV</th></tr></thead><tbody><tr><td class="r">At birth</td><td class="r">71.146</td><td class="r">84.176</td><td class="r">1.823 y/dec</td><td class="r">5.5x</td></tr><tr><td class="r">30</td><td class="r">74.867</td><td class="r">84.570</td><td class="r">1.503 y/dec</td><td class="r">6.7x</td></tr><tr><td class="r">50</td><td class="r">76.360</td><td class="r">85.043</td><td class="r">1.366 y/dec</td><td class="r">7.3x</td></tr><tr><td class="r">70</td><td class="r">81.287</td><td class="r">87.893</td><td class="r">0.974 y/dec</td><td class="r">10.3x</td></tr><tr><td class="r">80</td><td class="r">86.298</td><td class="r">90.579</td><td class="r">0.600 y/dec</td><td class="r">16.7x</td></tr><tr><td class="r">90</td><td class="r">92.904</td><td class="r">95.686</td><td class="r">0.370 y/dec</td><td class="r">27.0x</td></tr></tbody></table></div>
+
+      <p>The multiple is a ratio of rates:</p>
+
+      <pre><code>multiple needed to reach LEV = 10 / fitted years gained per decade</code></pre>
+
+      <p>It is not a multiplier of lifespan, survival probability, research funding, personnel or therapeutic efficacy.</p>
+
+      <h4>Current-trend projection</h4>
+
+      <p>The thin straight line extends the 1950-2023 fitted rate after 2023:</p>
+
+      <pre><code>V_current(t) = V_2023 + r0 * (t - 2023)</code></pre>
+
+      <p>where <code>r0</code> is the historical slope in years per calendar year.</p>
+
+      <h4>LEV-ramp scenario</h4>
+
+      <p>The dashed LEV path is illustrative. It assumes that the annual rate of progress rises linearly from the historical rate in 2023 to one expected-age year per year in 2050:</p>
+
+      <pre><code>V_LEV(t) = V_2023
+         + r0 * (t - 2023)
+         + 0.5 * ((1 - r0) / (2050 - 2023)) * (t - 2023)^2</code></pre>
+
+      <p>The curve reaches the LEV <strong>rate</strong> in 2050. It does not forecast that medicine will actually do so.</p>
+
+      <h3>1.10 The article&rsquo;s age-90 illustration</h3>
+
+      <p>The long-run age-90 slope is about 0.370 years gained per decade. Extending that rate mechanically from 2023 to 2078 gives:</p>
+
+      <pre><code>0.370 * (2078 - 2023) / 10 = 2.03 additional expected-age years</code></pre>
+
+      <p>The 2023 frontier expected age at death at 90 is 95.686, or 5.686 remaining years. Adding approximately 2.03 produces about 7.72 remaining years, rounded in the article to &ldquo;roughly eight rather than six.&rdquo; This is a period-trend illustration, not a cohort forecast for today&rsquo;s 38-year-olds.</p>
+
+      <h3>1.11 Figure 2: rolling progress and acceleration</h3>
+
+      <p>For every endpoint year <code>t</code>, progress is estimated with OLS over the 11 annual observations from <code>t-10</code> through <code>t</code>:</p>
+
+      <pre><code>rolling progress(t)
+  = 10 * OLS slope of frontier values from t-10 through t</code></pre>
+
+      <p>The window contains 11 observations but spans exactly ten calendar years. Therefore:</p>
+
+      <pre><code>first endpoint = 1960, using 1950-1960
+last endpoint  = 2023, using 2013-2023</code></pre>
+
+      <p>The rolling values are expressed in years gained per decade.</p>
+
+      <p>&ldquo;Acceleration&rdquo; is a second OLS fit to those rolling progress rates:</p>
+
+      <pre><code>rolling progress(t) = intercept + beta * t
+fitted acceleration = 10 * beta</code></pre>
+
+      <p>Its unit is <strong>years gained per decade, per calendar decade</strong>. For example, an acceleration of <code>+0.13 y/dec per decade</code> means that the fitted pace of progress rises by 0.13 years gained per decade every ten calendar years.</p>
+
+      <div class='tablewrap'><table><thead><tr><th class="r">Starting age</th><th class="r">Actual 2013-2023 rolling pace</th><th class="r">Fitted pace in 2023</th><th class="r">1960-2023 acceleration</th><th class="r">2000-2023 acceleration</th></tr></thead><tbody><tr><td class="r">At birth</td><td class="r">1.095</td><td class="r">2.173</td><td class="r">+0.133</td><td class="r">-0.54</td></tr><tr><td class="r">30</td><td class="r">0.966</td><td class="r">2.008</td><td class="r">+0.183</td><td class="r">-0.72</td></tr><tr><td class="r">50</td><td class="r">0.802</td><td class="r">1.819</td><td class="r">+0.162</td><td class="r">-0.53</td></tr><tr><td class="r">60</td><td class="r">0.784</td><td class="r">1.640</td><td class="r">+0.144</td><td class="r">-0.30</td></tr><tr><td class="r">70</td><td class="r">0.681</td><td class="r">1.374</td><td class="r">+0.135</td><td class="r">-0.22</td></tr><tr><td class="r">80</td><td class="r">0.788</td><td class="r">0.938</td><td class="r">+0.113</td><td class="r">+0.04</td></tr><tr><td class="r">90</td><td class="r">0.690</td><td class="r">0.616</td><td class="r">+0.073</td><td class="r">+0.11</td></tr></tbody></table></div>
+
+      <p>All rates in the table are in years gained per decade; acceleration columns are per calendar decade. The fitted 2023 pace differs from the actual 2013-2023 pace because the former is the endpoint of a regression line fitted through every rolling window.</p>
+
+      <p>Adjacent rolling windows share ten of their 11 observations. The fitted acceleration is therefore descriptive, not a causal estimate with independent annual observations.</p>
+
+      <p>The primary figure includes 2020-2023 and the COVID shock. A 2009-2019 fit is used only as a pre-COVID sensitivity in the mortality figure.</p>
+
+      <h3>1.12 Convexity and the shape of the expected-age curve</h3>
+
+      <p>A sustained positive acceleration means the fitted slope rises over calendar time. Under that fitted model, the expected-age-at-death curve is convex: successive future calendar decades add progressively more expected-age years.</p>
+
+      <p>Positive acceleration alone does not imply LEV. LEV is reached only if the pace itself eventually reaches ten years gained per decade. A small positive acceleration can remain far below that threshold for centuries.</p>
+
+      <h3>1.13 Figure 3: mechanical time to LEV</h3>
+
+      <p>The time-to-LEV figure asks a deliberately narrow question: if the fitted 1960-2023 acceleration continued linearly without limit, when would the fitted pace cross ten years per decade?</p>
+
+      <p>For a positive acceleration:</p>
+
+      <pre><code>crossing year
+  = 2023 + (10 - fitted pace in 2023)
+           / (acceleration per calendar year)</code></pre>
+
+      <p>The stored acceleration is per calendar decade, so it is divided by ten before solving for calendar years.</p>
+
+      <div class='tablewrap'><table><thead><tr><th class="r">Starting age</th><th class="r">Mechanical crossing year</th></tr></thead><tbody><tr><td class="r">At birth</td><td class="r">2610</td></tr><tr><td class="r">30</td><td class="r">2459</td></tr><tr><td class="r">50</td><td class="r">2527</td></tr><tr><td class="r">60</td><td class="r">2604</td></tr><tr><td class="r">70</td><td class="r">2664</td></tr><tr><td class="r">80</td><td class="r">2827</td></tr><tr><td class="r">90</td><td class="r">3300</td></tr></tbody></table></div>
+
+      <p>These dates are not forecasts. They are scale indicators showing that the observed historical acceleration is much too small to imply near-term LEV. The earliest mechanical crossing in the current specification is 2459 at age 30.</p>
+
+      <h3>1.14 Figures 4 and 5: mortality schedules and the Gompertz fit</h3>
+
+      <p>For the coherent mortality frontier, the analysis uses the WPP central death rate <code>mx</code> at each age. Male and female <code>mx</code> values are averaged within each selected country, then the median across the five selected countries is taken at each age.</p>
+
+      <p>Adult mortality is summarized with the Gompertz model:</p>
+
+      <pre><code>mu(x) = alpha * exp(beta * x)
+ln(mu(x)) = ln(alpha) + beta * x</code></pre>
+
+      <p>An OLS line is fitted to <code>ln(mx)</code> against the midpoint of each five-year age group from 35-39 through 85-89. The line is displayed through age 95 as a visual out-of-sample check.</p>
+
+      <p>For the 2023 frontier:</p>
+
+      <pre><code>alpha = 8.334e-6
+beta = 0.10451 per year
+R-squared = 0.9966
+mortality-rate doubling time = ln(2) / beta = 6.63 years</code></pre>
+
+      <p>For 1950, <code>beta = 0.09691</code> and the doubling time is 7.15 years. The estimated level parameter <code>alpha</code> fell by about fivefold from 1950 to 2023, while the age slope did not flatten. This is the basis for the article&rsquo;s description of the mortality curve moving down without materially &ldquo;tilting&rdquo; toward slower age-related growth.</p>
+
+      <p>The figure stops at age 95. WPP&rsquo;s age-100 interval is open-ended and largely model-dependent; plotting it as if it were an ordinary five-year point can create a false plateau.</p>
+
+      <h3>1.15 Survival from age 100</h3>
+
+      <p>The article&rsquo;s extreme-old-age examples use official national life tables rather than the open WPP 100+ interval.</p>
+
+      <h4>Japan</h4>
+
+      <p>In Japan&rsquo;s 23rd complete life table for women, 8,153 of the synthetic cohort are alive at exact age 100 and 47 at exact age 110:</p>
+
+      <pre><code>P(survive 100 to 110) = 47 / 8,153 = 0.005765
+inverse probability   = 173.5</code></pre>
+
+      <p>Rounded: about <strong>one in 173</strong>.</p>
+
+      <h4>United States</h4>
+
+      <p>Using the female one-year death probabilities in the US Social Security Administration&rsquo;s 2023 period life table:</p>
+
+      <pre><code>P(survive 100 to 110) = product of (1 - qx), x = 100,...,109
+                      = 0.002617
+inverse probability   = 382.1</code></pre>
+
+      <p>Rounded: about <strong>one in 382</strong>.</p>
+
+      <p>Continuing the published probabilities through age 119 gives:</p>
+
+      <pre><code>P(survive 100 to 120) = 7.405e-10
+inverse probability   = 1.350 billion</code></pre>
+
+      <p>In the article&rsquo;s counterfactual plateau, the published US probabilities are retained through age 104 and the annual probability of death is set to 50% from age 105 onward:</p>
+
+      <pre><code>P(survive 100 to 120) = observed survival through 104 * 0.5^15
+                      = 2.833e-6
+inverse probability   = 353,016</code></pre>
+
+      <p>Rounded: about <strong>one in 350,000</strong>. This plateau is a hypothetical illustration, not an empirical claim.</p>
+
+      <h3>1.16 Figure 6: mortality decline equivalent to LEV</h3>
+
+      <p>The mortality-decline figure translates expected-age progress into a proportional change in the entire age-specific mortality schedule.</p>
+
+      <h4>Expected age from a mortality schedule</h4>
+
+      <p>WPP provides abridged death rates at ages 0, 1, 5, 10, ..., 100. Hazards are treated as constant within each interval: width one at age 0, width four at age 1 and width five thereafter. The age-100 interval is treated as open.</p>
+
+      <p>For interval mortality <code>m</code>, width <code>w</code> and survival entering the interval <code>S</code>, expected person-years contributed by the interval are:</p>
+
+      <pre><code>S * (1 - exp(-m*w)) / m</code></pre>
+
+      <p>Survival then becomes:</p>
+
+      <pre><code>S * exp(-m*w)</code></pre>
+
+      <p>The open age-100 interval contributes <code>S/m</code>.</p>
+
+      <h4>Converting an expected-age trend into a mortality decline</h4>
+
+      <p>For each comparison period, an OLS trend is first fitted to the coherent frontier&rsquo;s expected age at death at birth:</p>
+
+      <div class='tablewrap'><table><thead><tr><th>Period</th><th class="r">Expected-age gain</th><th class="r">Equivalent common log-rate mortality decline</th><th class="r">Multiple to LEV</th></tr></thead><tbody><tr><td>2013-2023</td><td class="r">0.1095 y/y</td><td class="r">1.1946%/year</td><td class="r">9.15x</td></tr><tr><td>2009-2019</td><td class="r">0.1641 y/y</td><td class="r">1.7300%/year</td><td class="r">6.32x</td></tr><tr><td>1950-2023</td><td class="r">0.1823 y/y</td><td class="r">1.9884%/year</td><td class="r">5.50x</td></tr></tbody></table></div>
+
+      <p>For each row, every age-specific death rate in the period-end schedule is multiplied by the same factor <code>exp(-r)</code>. A binary search finds the <code>r</code> that produces the same expected-age gain when the life table is recalculated.</p>
+
+      <p>The LEV benchmark applies the same procedure to the 2023 schedule and finds the common decline that increases expected age at death by exactly one year. This calculation uses the complete abridged mortality schedule; it does not assume that mortality follows a Gompertz curve:</p>
+
+      <pre><code>annual log mortality decline required for LEV = 10.9277%
+equivalent ordinary annual reduction          = 10.3518%</code></pre>
+
+      <p>An earlier version used the 2023 fitted Gompertz age slope, <code>beta = 0.10451</code>, as a shortcut and obtained <code>10.45%</code>. Under a pure Gompertz model, a parallel mortality shift of <code>beta</code> moves expected age at death by approximately one year. The shortcut is close, but the exact life-table result is preferable because the observed schedule is not purely Gompertz at young and extreme ages. The final mortality-target figure therefore uses the full-life-table value, not the Gompertz approximation.</p>
+
+      <p>The upper age-specific lines in the figure are diagnostics. At each age, they show <code>-slope(ln(mx))</code> over 2013-2023, 2009-2019 and 1950-2023. They are not separate LEV targets for each age.</p>
+
+      <h4>Important percentage convention</h4>
+
+      <p>The chart reports continuously compounded log-rate declines because the age-specific diagnostics are estimated as changes in <code>ln(mx)</code>. The computed <code>10.9277%</code> log-rate is equivalent to the following ordinary one-year proportional reduction:</p>
+
+      <pre><code>1 - exp(-0.109277) = 10.3518%</code></pre>
+
+      <p>Under the implemented log-rate convention, compounding for 27 years from 2023 to 2050 leaves:</p>
+
+      <pre><code>exp(-0.109277 * 27) = 5.23% of the 2023 mortality-rate baseline</code></pre>
+
+      <p>or a 94.77% reduction. For general readers, the clearest wording is: <strong>age-specific mortality rates would need to fall by about 10.4% each year</strong>. Treating <code>10.9%</code> as an ordinary discrete percentage and calculating <code>(1 - 0.109)^27</code> leaves 4.40%, but that mixes two conventions and is not the calculation implemented in the figure.</p>
+
+      <p>The phrase &ldquo;10.9% fewer people dying each year&rdquo; is only an intuition. The calculation concerns age-specific period mortality <strong>rates</strong>, not the crude number of deaths, which also depends on population size and age structure.</p>
+
+      <h3>1.17 Verification</h3>
+
+      <p>The expected-age frontier and acceleration results were independently recomputed directly from the raw WPP files. The audit found:</p>
+
+      <ul><li>2,590 top-five membership rows matched;</li><li>zero membership-identity mismatches;</li><li>zero candidate-count mismatches;</li><li>zero population-filter failures;</li><li>maximum rolling-rate difference of 0.00005 y/dec;</li><li>maximum mechanical-crossing difference of 0.08 year in the current specification.</li></ul>
+
+      <p>The remaining differences are display rounding.</p>
+
+      <h3>1.18 Limitations</h3>
+
+      <ol><li><strong>Period versus cohort:</strong> period life tables are snapshots, not realized cohort forecasts.</li><li><strong>Frontier switching:</strong> the top-five membership changes over time and, in the expected-age figures, by starting age.</li><li><strong>WPP estimation:</strong> many country-years, particularly at advanced ages, include modeled mortality rather than complete direct observation.</li><li><strong>Old-age uncertainty:</strong> small survivor counts, age misstatement and the open 100+ interval limit inference at extreme ages.</li><li><strong>Overlapping rolling windows:</strong> adjacent rolling-progress estimates are strongly dependent.</li><li><strong>Linear fits:</strong> OLS summaries compress nonlinear historical changes into one rate.</li><li><strong>COVID:</strong> the current 2013-2023 endpoint includes the pandemic and its aftermath; 2009-2019 is shown as a sensitivity.</li><li><strong>Mechanical extrapolation:</strong> the LEV ramp and crossing years are scenarios, not forecasts.</li><li><strong>No causal attribution:</strong> the analysis measures outcomes but does not estimate which technologies, policies or expenditures caused them.</li><li><strong>No input-output production function:</strong> a 7-27x outcome-rate gap does not imply 7-27x more funding or personnel. Biomedical inputs may translate into outcomes sublinearly, superlinearly or only after long lags.</li></ol>
+
+      <h3>1.19 Future validation with the Human Mortality Database</h3>
+
+      <p>The Human Mortality Database (HMD) could be used in a future sensitivity analysis to:</p>
+
+      <ul><li>validate ages 80 and 90 with harmonized death and exposure data;</li><li>test whether surprising old-age frontier members persist in a higher-quality-data sample;</li><li>compare the dynamic frontier with a fixed-country panel;</li><li>quantify sensitivity to age misstatement and old-age population thresholds.</li></ul>
+
+      <p>HMD has narrower and uneven country-year coverage. It should therefore be reported as a separate robustness analysis, not spliced into the WPP series.</p>
+
+      <h2>2. Sources and claim audit</h2>
+
+      <h3>2.1 Primary demographic and actuarial sources</h3>
+
+      <ol><li><a href="https://www.un.org/development/desa/pd/world-population-prospects-2024" target="_blank" rel="noopener">UN DESA, World Population Prospects 2024</a>, abridged life tables and population by age and sex, Medium variant.</li><li><a href="https://www.un.org/development/desa/pd/content/world-population-prospects-2024-methodology-report" target="_blank" rel="noopener">WPP 2024 methodology report</a>.</li><li><a href="https://www.mhlw.go.jp/english/database/db-hw/lifetb23nd/dl/data.pdf" target="_blank" rel="noopener">Japan Ministry of Health, Labour and Welfare, 23rd Complete Life Tables (2020)</a>.</li><li><a href="https://www.ssa.gov/oact/STATS/table4c6.html" target="_blank" rel="noopener">US Social Security Administration, 2023 Period Life Table</a>.</li></ol>
+
+      <h3>2.2 Article claims derived from this analysis</h3>
+
+      <div class='tablewrap'><table><thead><tr><th>Claim in the article</th><th>Derivation</th><th>Status</th></tr></thead><tbody><tr><td>The frontier advanced about 0.4-1.8 years per decade</td><td>OLS slopes by starting age: 0.370 at 90 through 1.823 at birth</td><td>Verified from raw WPP</td></tr><tr><td>LEV requires progress to become about 5.5-27x faster</td><td><code>10 / historical slope</code></td><td>Verified arithmetic; ratio of outcome rates only</td></tr><tr><td>Progress at ages 80 and 90 still has slight recent acceleration</td><td>2000-2023 acceleration is +0.04 and +0.11 y/dec per decade, respectively</td><td>Verified; descriptive fit</td></tr><tr><td>Earliest mechanical LEV crossing is 2459</td><td>Linear continuation of fitted 1960-2023 rolling acceleration at age 30</td><td>Verified; not a forecast</td></tr><tr><td>A current 38-year-old reaching 90 in 2078 would have about two more expected remaining years under the long-run trend</td><td><code>0.3699 * 55 / 10 = 2.03</code></td><td>Arithmetic verified; period-trend illustration, not cohort forecast</td></tr><tr><td>Adult mortality is close to Gompertz-exponential</td><td>2023 log-linear fit, ages 35-85, <code>R-squared = 0.9966</code></td><td>Verified on coherent 2023 frontier schedule</td></tr><tr><td>The mortality curve moved down without flattening</td><td><code>alpha</code> fell about 5x; beta rose from 0.0969 to 0.1045</td><td>Verified fit; &ldquo;without flattening&rdquo; is the cautious wording</td></tr><tr><td>Japanese women: about 1 in 173 survive from 100 to 110</td><td><code>47 / 8,153</code> in Japan&rsquo;s complete life table</td><td>Verified</td></tr><tr><td>US women: about 1 in 382 survive from 100 to 110</td><td>Product of SSA female survival probabilities, ages 100-109</td><td>Verified</td></tr><tr><td>US table implies about 1 in 1.35 billion survive from 100 to 120</td><td>Product of SSA female survival probabilities, ages 100-119</td><td>Verified arithmetic on published model probabilities</td></tr><tr><td>A 50% annual mortality plateau after 105 gives about 1 in 350,000 to age 120</td><td>SSA survival through 104, then <code>0.5^15</code></td><td>Verified hypothetical calculation</td></tr><tr><td>Current mortality improvement is about 1.19-1.99%/year, 5-9x short of LEV</td><td>Exact life-table equivalent for 2013-2023, 2009-2019 and 1950-2023</td><td>Verified on the chart's continuous log-rate scale</td></tr><tr><td>The exact LEV-equivalent rate is 10.93% on the continuous log scale, or a 10.35% ordinary annual reduction</td><td>Full 2023 abridged life-table calculation</td><td>Verified; the earlier 10.45% value was a Gompertz shortcut</td></tr><tr><td>Mortality rates in 2050 would be about 94.8% below today, at 5.2% of baseline</td><td><code>exp(-0.109277 * 27)</code></td><td>Verified under the implemented log-rate convention</td></tr></tbody></table></div>
+
+      <h3>2.3 Biomedical progress comparison claims</h3>
+
+      <p>The comparisons are context, not inputs to the LEV calculations. &ldquo;Today&rdquo; means the latest year used when the article was drafted; where 2000 was unavailable, the article used 2001 or 2002.</p>
+
+      <div class='tablewrap'><table><thead><tr><th>Article claim</th><th>Source and reconstruction</th><th>Assessment</th></tr></thead><tbody><tr><td>Genome sequencing: about $95M versus $525, roughly 180,000x cheaper</td><td><a href="https://www.genome.gov/about-genomics/fact-sheets/DNA-Sequencing-Costs-Data" target="_blank" rel="noopener">NHGRI sequencing-cost data</a>. The first human-sized-genome point is about $95.3M in 2001; the last official point is $525 in May 2022; ratio about 181,500x. These are production sequencing costs, not all-in clinical interpretation.</td><td>Verified</td></tr><tr><td>Experimental protein structures: 13,000 versus about 255,000, roughly 20x</td><td><a href="https://www1.rcsb.org/stats/growth/growth-released-structures" target="_blank" rel="noopener">RCSB PDB growth statistics</a>: 13,583 in 2000; 247,247 at end-2025 and 257,181 during 2026. The live total changes.</td><td>Verified; endpoint is moving</td></tr><tr><td>AlphaFold helped train on experimental structures and now provides over 200M predictions</td><td><a href="https://alphafold.ebi.ac.uk/" target="_blank" rel="noopener">AlphaFold Protein Structure Database</a> reports over 200M predictions. Experimental PDB structures and AlphaFold predictions are not equivalent units.</td><td>Verified qualitative comparison</td></tr><tr><td>FDA novel drugs: 27 versus 46, about 1.7x</td><td><a href="https://www.fda.gov/drugs/drug-approvals-and-databases/compilation-cder-new-molecular-entity-nme-drug-and-new-biologic-approvals" target="_blank" rel="noopener">FDA NME/new-biologic compilation</a> for 2000; <a href="https://www.fda.gov/drugs/novel-drug-approvals-fda/novel-drug-approvals-2025" target="_blank" rel="noopener">FDA 2025 report</a> for 46 in 2025.</td><td>Verified; CDER novel drugs do not include every CBER product</td></tr><tr><td>INDs: 1,384 versus 1,960, about 1.4x</td><td>FDA <a href="https://www.fda.gov/media/76869/download" target="_blank" rel="noopener">archived 1986-2008 report</a> gives 1,384 in 2000; FDA's <a href="https://www.fda.gov/media/191373/download" target="_blank" rel="noopener">2025 report</a> gives 1,960.</td><td>Verified; both figures are FDA IND receipts</td></tr><tr><td>Global pharma R&amp;D: $68B versus $288B; 4.2x nominal and 2.2x real</td><td>Evaluate World Preview series, summarized in the <a href="https://www.evaluate.com/thought-leadership/world-preview-2024-report/" target="_blank" rel="noopener">2024 report hub</a>. Applying the NIH <a href="https://officeofbudget.od.nih.gov/gbipriceindexes.html" target="_blank" rel="noopener">BRDPI</a> 2002-2024 factor of about 1.914 converts $68B to about $130.2B in 2024 biomedical-R&amp;D dollars; <code>$288B / $130.2B = 2.21x</code>.</td><td>Reconstructable; 2000 comparison actually starts in 2002 and uses a US biomedical deflator on a global company series</td></tr><tr><td>US biotech venture capital: about $3.9B in 2000 versus $18.4B in 2023; 4.7x nominal and approximately 2.7x inflation-adjusted</td><td><a href="https://www.bioworld.com/articles/476539" target="_blank" rel="noopener">BioWorld's 2001 industry review</a> is the best-verified source for the 2000 VC-only estimate. PitchBook reports <a href="https://www.biopharmadive.com/news/venture-capital-biotech-q4-2023-pitchbook/704339/" target="_blank" rel="noopener">$18.4B across 481 biopharma deals in 2023</a>. The real ratio uses annual-average US <a href="https://www.bls.gov/cpi/tables/supplemental-files/historical-cpi-u-202411.pdf" target="_blank" rel="noopener">CPI-U</a>: <code>18.4 / (3.9 * 304.7 / 172.2) = 2.67x</code>. Historical data providers and industry definitions changed, including restatements by MoneyTree and the later switch to PitchBook.</td><td>Arithmetic verified; directionally informative, but the ratio is not a clean like-for-like time series</td></tr><tr><td>US bioscience employment: 1.5M versus 2.3M, about 1.5x</td><td>The 2014 Battelle/BIO report was summarized as 1.62M jobs, 111,000 above 2001, implying about 1.51M in 2001. <a href="https://www.bio.org/press-release/new-report-finds-bioscience-sector-generates-over-3-trillion-us-economy" target="_blank" rel="noopener">BIO/TEConomy</a> reports 2.29M in 2023.</td><td>Broadly verified; endpoint starts in 2001 and depends on a broad bioscience-industry definition</td></tr><tr><td>Therapeutic toolkit expanded through first approvals of CAR-T cell therapies, mRNA vaccines, CRISPR-edited therapies and PROTAC protein degraders</td><td>The first FDA approvals occurred for <a href="https://www.fda.gov/media/172125/download" target="_blank" rel="noopener">CAR-T in 2017</a>, <a href="https://www.fda.gov/news-events/press-announcements/fda-approves-first-covid-19-vaccine" target="_blank" rel="noopener">an mRNA vaccine in 2021</a>, <a href="https://www.fda.gov/news-events/press-announcements/fda-approves-first-gene-therapies-treat-patients-sickle-cell-disease" target="_blank" rel="noopener">a CRISPR-edited therapy in 2023</a> and <a href="https://www.fda.gov/drugs/resources-information-approved-drugs/fda-approves-vepdegestrant-er-positive-her2-negative-esr1-mutated-advanced-or-metastatic-breast" target="_blank" rel="noopener">a PROTAC/heterobifunctional degrader in 2026</a>.</td><td>Milestones verified; no numerical modality count is used because no canonical closed taxonomy was identified</td></tr><tr><td>NIH program-level funding rose about 2.6x nominally but remains below the 2003 real peak</td><td><a href="https://www.congress.gov/crs-products/product/pdf/R/R43341" target="_blank" rel="noopener">CRS R43341</a> gives $17.841B in FY2000 and $46.995B in FY2025, a 2.63x nominal increase. Program level includes NIH's regular funding sources and transfers but excludes ARPA-H and emergency supplementals. CRS identifies FY2003 as the peak in FY2024 constant dollars using the NIH <a href="https://officeofbudget.od.nih.gov/gbipriceindexes.html" target="_blank" rel="noopener">BRDPI</a>.</td><td>Verified on a consistent program-level basis; it is not an obligations or outlays series</td></tr><tr><td>UK Biobank did not exist in 2000</td><td>UK Biobank was established in 2003; recruitment began later. Its <a href="https://community.ukbiobank.ac.uk/hc/en-gb/articles/25118589261213-500k-Whole-Genome-Sequencing-General-FAQs" target="_blank" rel="noopener">500,000-participant whole-genome release</a> was published in November 2023.</td><td>Verified; &ldquo;established in 2003&rdquo; is more precise</td></tr><tr><td>Single-cell omics did not exist in 2000</td><td>The first widely cited single-cell whole-transcriptome RNA-seq paper was published in 2009: <a href="https://www.nature.com/articles/nmeth.1315" target="_blank" rel="noopener">Tang et al., Nature Methods</a>. Earlier single-cell measurements existed, so &ldquo;single-cell omics&rdquo; should be understood as modern sequencing-scale methods.</td><td>Defensible with qualification</td></tr></tbody></table></div>
+
+      <h3>2.4 Interpretation notes for the biomedical comparisons</h3>
+
+      <ol><li><strong>Mortality percentage convention:</strong> the exact target is <code>10.9277%</code> on the chart's continuous log-rate scale, equivalent to an ordinary annual reduction of <code>10.3518%</code>. The reader-facing prose should use approximately <strong>10.4%</strong>, with <strong>5.2% of the 2023 mortality-rate baseline remaining in 2050</strong>.</li><li><strong>Biotech venture capital:</strong> the corrected comparison is <code>$3.9B -&gt; $18.4B</code>, or <strong>4.7x nominal</strong> and approximately <strong>2.7x in 2023 CPI-adjusted dollars</strong>. The values come from different data regimes, so they establish direction and scale but are not a clean like-for-like growth series.</li><li><strong>Therapeutic modalities:</strong> the numerical <code>5-6 -&gt; 20-21</code> comparison has been removed. The first-approval milestones communicate the expansion without relying on an arbitrary taxonomy.</li><li><strong>INDs:</strong> the comparison now uses the FDA's 2025 total of <code>1,960</code>.</li><li><strong>Global pharma R&amp;D:</strong> the nominal comparison is sourced to Evaluate. The <code>2.2x real</code> estimate should be described as approximate because it applies the US BRDPI to a global company-spending series.</li><li><strong>NIH funding:</strong> the comparison uses <strong>program level</strong>, not budget authority, obligations or outlays. ARPA-H and emergency supplemental funding are excluded.</li></ol>
+
+      <h3>2.5 Reproducibility files</h3>
+
+      <p>Core expected-age outputs:</p>
+
+      <pre><code>outputs/top5_longevity_frontier_values_1950_2023.csv
+outputs/top5_longevity_frontier_slopes_1950_2023.csv
+outputs/top5_longevity_frontier_members_long_1950_2023.csv
+outputs/top5_longevity_frontier_lev_vs_current_rate_1950_2050_summary.csv</code></pre>
+
+      <p>Rolling progress and time-to-LEV:</p>
+
+      <pre><code>outputs/top5_equal_weight_frontier_acceleration_1960_2023_and_2000_2023.csv
+outputs/top5_equal_weight_frontier_time_to_lev_1960_2023.csv
+outputs/top5_equal_weight_time_to_lev_raw_wpp_audit.csv</code></pre>
+
+      <p>Mortality and Gompertz analysis:</p>
+
+      <pre><code>outputs/gompertz_frontier_results.json
+outputs/gompertz_charts_ABGM_styled_checks.json
+outputs/gompertz_chart_G_corrected_checks.json
+outputs/gompertz_chart_G_original_vs_corrected_values.csv</code></pre>
+
+      <p>Principal calculation scripts:</p>
+
+      <pre><code>work/draw_top5_longevity_frontier_1950_design.py
+work/render_wpp_acceleration_and_lev_timing_verified.py
+work/gompertz_frontier_analysis.py
+work/render_chart_g_corrected_comparison.py</code></pre>
+
+      <p>The raw-WPP audit, rather than visual agreement between charts, is the final check on the expected-age and acceleration values.</p>
+    </div>
+
+    <footer class="footer">
+      <span>&copy; 2026 Alexey Strygin</span>
+      <span>STRYG.IN</span>
+    </footer>
+  </div>
+</section>
+
+<script>
+  (function(){
+    const c = document.getElementById('matrix-canvas');
+    const ctx = c.getContext('2d');
+    const chars = 'AGCTAGCTAGCTAGCT'.split('');
+    const fontSize = 14;
+    const color = '#C8FF00';
+    let cols=0, drops=[];
+    function resize(){
+      c.width=window.innerWidth; c.height=window.innerHeight;
+      cols=Math.floor(c.width/fontSize);
+      drops=Array.from({length:cols},()=>Math.floor(Math.random()*-100));
+    }
+    resize(); window.addEventListener('resize',resize);
+    let last=0;
+    function draw(ts){
+      if(ts-last>50){
+        last=ts;
+        ctx.fillStyle='rgba(0,0,0,0.06)';
+        ctx.fillRect(0,0,c.width,c.height);
+        ctx.font=fontSize+'px JetBrains Mono, monospace';
+        for(let i=0;i<drops.length;i++){
+          const t=chars[Math.floor(Math.random()*chars.length)];
+          const x=i*fontSize, y=drops[i]*fontSize;
+          if(Math.random()>0.98){
+            ctx.fillStyle='#ffffff';
+            ctx.shadowColor='#ffffff'; ctx.shadowBlur=8;
+          } else {
+            ctx.fillStyle=color; ctx.shadowBlur=0;
+          }
+          ctx.fillText(t,x,y);
+          ctx.shadowBlur=0;
+          if(y>c.height && Math.random()>0.975) drops[i]=0;
+          drops[i]++;
+        }
+      }
+      requestAnimationFrame(draw);
+    }
+    requestAnimationFrame(draw);
+  })();
+</script>
+</body>
+</html>
